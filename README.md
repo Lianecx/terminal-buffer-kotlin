@@ -9,6 +9,7 @@ Requires JDK 21.
 ```bash
 ./gradlew build   # compile
 ./gradlew run     # launch the interactive demo
+./gradlew test    # run unit tests
 ```
 
 ## Architecture
