@@ -209,6 +209,10 @@ class TerminalBuffer(
         }
 
         val existingCells = flattenCellsFromCursor(cursorCol, cursorRow)
+        // Trim trailing empty cells to avoid unnecessary scrolling
+        while (existingCells.isNotEmpty() && existingCells.last() == EMPTY_CELL) {
+            existingCells.removeLast()
+        }
         val newCells = textToCells(text)
         val combined = newCells + existingCells
 
