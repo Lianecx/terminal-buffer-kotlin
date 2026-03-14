@@ -167,3 +167,7 @@ buf.resize(newWidth, newHeight)
 - **Alternate screen buffer** — real terminals support switching between primary and alternate buffers (used by vim, less, etc.)
 - **Scroll regions** — defining a subset of rows that scroll independently (used by status bars, split panes)
 - **Selection and copy** — selecting text ranges and extracting them as strings
+
+## Note on AI Usage
+
+AI (Claude Code) was used during development, significantly speeding up the implementation process. All code was carefully reviewed by me to ensure it meets my own code standards and style.
