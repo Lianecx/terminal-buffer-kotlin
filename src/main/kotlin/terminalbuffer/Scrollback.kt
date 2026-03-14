@@ -7,14 +7,12 @@ class Scrollback(private val maxSize: Int) {
 
     fun addLine(line: BufferLine) {
         if (maxSize <= 0) return
-        if (lines.size >= maxSize) {
-            lines.removeFirst()
-        }
+        if (lines.size >= maxSize) lines.removeFirst()
         lines.addLast(line)
     }
 
     operator fun get(index: Int): BufferLine {
-        require(index in 0 until lines.size) { "Scrollback index $index out of bounds [0, ${lines.size})" }
+        require(index in 0..<lines.size) { "Scrollback index $index out of bounds [0, ${lines.size})" }
         return lines[index]
     }
 
@@ -45,8 +43,6 @@ class Scrollback(private val maxSize: Int) {
     }
 
     fun resizeLines(newWidth: Int) {
-        for (i in lines.indices) {
-            lines[i] = lines[i].resized(newWidth)
-        }
+        for (i in lines.indices) lines[i] = lines[i].resized(newWidth)
     }
 }

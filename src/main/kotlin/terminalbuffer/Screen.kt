@@ -7,7 +7,7 @@ class Screen(var width: Int, var height: Int) {
     private fun physicalIndex(logicalRow: Int): Int = (topRow + logicalRow) % height
 
     operator fun get(row: Int): BufferLine {
-        require(row in 0 until height) { "Row $row out of bounds [0, $height)" }
+        require(row in 0..<height) { "Row $row out of bounds [0, $height)" }
         return lines[physicalIndex(row)]
     }
 
@@ -23,15 +23,13 @@ class Screen(var width: Int, var height: Int) {
     }
 
     fun clear() {
-        for (line in lines) {
-            line.clear()
-        }
+        for (line in lines) line.clear()
         topRow = 0
     }
 
     fun toText(): String {
         val sb = StringBuilder()
-        for (row in 0 until height) {
+        for (row in 0..<height) {
             if (row > 0) sb.append('\n')
             sb.append(this[row].toText())
         }
@@ -47,7 +45,7 @@ class Screen(var width: Int, var height: Int) {
         if (newHeight < height) {
             // Lines that don't fit go to scrollback (from the top)
             val excess = height - newHeight
-            for (i in 0 until excess) {
+            for (i in 0..<excess) {
                 evicted.add(if (newWidth != width) currentLines[i].resized(newWidth) else currentLines[i].copyOf())
             }
             // Remaining lines become the new screen
@@ -82,9 +80,7 @@ class Screen(var width: Int, var height: Int) {
      */
     fun fillFromScrollback(scrollbackLines: List<BufferLine>) {
         for (i in scrollbackLines.indices) {
-            if (i < height) {
-                lines[i].copyFrom(scrollbackLines[i])
-            }
+            if (i < height) lines[i].copyFrom(scrollbackLines[i])
         }
     }
 }

@@ -1,99 +1,194 @@
 package terminalbuffer
 
 import terminalbuffer.model.*
+import terminalbuffer.ui.TerminalBufferViewer
 
 fun main() {
-    val buf = TerminalBuffer(width = 40, height = 5, maxScrollback = 100)
+    val buf = TerminalBuffer(width = 100, height = 24, maxScrollback = 200)
 
-    println("=== Terminal Buffer Demo ===")
-    println()
+    // ── Title bar ───────────────────────────────────────────────
+    buf.setBackground(Color.BLUE)
+    buf.setForeground(Color.WHITE)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.fillLine(' ')
+    buf.setCursor(2, 0)
+    buf.write(" Terminal Buffer Demo ")
+    buf.resetAttributes()
 
-    // Write some text
+    // ── Colorful text samples ───────────────────────────────────
+    buf.setCursor(0, 2)
     buf.setForeground(Color.GREEN)
     buf.addStyle(StyleFlag.BOLD)
-    buf.write("Hello, Terminal!")
+    buf.write("$ ")
+    buf.resetAttributes()
+    buf.setForeground(Color.WHITE)
+    buf.write("echo \"Hello from the terminal buffer!\"")
     buf.resetAttributes()
 
-    println("After writing 'Hello, Terminal!' in green bold:")
-    println(buf.getScreenContent())
-    println("Cursor: ${buf.getCursor()}")
-    println()
-
-    // Move to next line and write more
-    buf.setCursor(0, 1)
-    buf.setForeground(Color.CYAN)
-    buf.write("Line 2: some content here")
-    buf.resetAttributes()
-
-    println("After writing line 2:")
-    println(buf.getScreenContent())
-    println()
-
-    // Insert text mid-line
-    buf.setCursor(8, 1)
-    buf.setForeground(Color.YELLOW)
-    buf.insert("INSERTED ")
-    buf.resetAttributes()
-
-    println("After inserting 'INSERTED ' at column 8, line 1:")
-    println(buf.getScreenContent())
-    println()
-
-    // Fill a line
     buf.setCursor(0, 3)
-    buf.setForeground(Color.RED)
-    buf.fillLine('-')
+    buf.setForeground(Color.CYAN)
+    buf.write("Hello from the terminal buffer!")
     buf.resetAttributes()
 
-    println("After filling line 3 with '-':")
-    println(buf.getScreenContent())
-    println()
+    // ── Color palette ───────────────────────────────────────────
+    buf.setCursor(0, 5)
+    buf.setForeground(Color.WHITE)
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.write("Standard colors:")
+    buf.resetAttributes()
 
-    // Scroll test: write enough to cause scrolling
-    for (i in 0 until 7) {
-        buf.setCursor(0, buf.height - 1)
-        buf.insertLineAtBottom()
-        buf.setCursor(0, buf.height - 1)
-        buf.write("Scroll line $i")
+    buf.setCursor(0, 6)
+    val standardColors = listOf(
+        Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW,
+        Color.BLUE, Color.MAGENTA, Color.CYAN, Color.WHITE
+    )
+    for (color in standardColors) {
+        buf.setBackground(color)
+        buf.write("  ")
+        buf.resetAttributes()
     }
 
-    println("After scrolling (7 insertLineAtBottom calls):")
-    println("Screen:")
-    println(buf.getScreenContent())
-    println()
-    println("Scrollback size: ${buf.getScrollbackSize()}")
-    println("Full content:")
-    println(buf.getFullContent())
-    println()
+    buf.setCursor(0, 7)
+    buf.setForeground(Color.WHITE)
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.write("Bright colors:")
+    buf.resetAttributes()
 
-    // Wide character demo
-    buf.clearScreen()
-    buf.write("Wide: \u4F60\u597D\u4E16\u754C")  // 你好世界
-    println("After writing wide chars (你好世界):")
-    println(buf.getScreenContent())
-    println("Cursor: ${buf.getCursor()}")
+    buf.setCursor(0, 8)
+    val brightColors = listOf(
+        Color.BRIGHT_BLACK, Color.BRIGHT_RED, Color.BRIGHT_GREEN, Color.BRIGHT_YELLOW,
+        Color.BRIGHT_BLUE, Color.BRIGHT_MAGENTA, Color.BRIGHT_CYAN, Color.BRIGHT_WHITE
+    )
+    for (color in brightColors) {
+        buf.setBackground(color)
+        buf.write("  ")
+        buf.resetAttributes()
+    }
 
-    // Check cell properties
-    val cell = buf.getCell(6, 0)
-    println("Cell at (6,0): char='${cell.char}', isWide=${cell.isWide}")
-    val cont = buf.getCell(7, 0)
-    println("Cell at (7,0): char='${cont.char}', isWideContinuation=${cont.isWideContinuation}")
-    println()
+    // ── Style showcase ──────────────────────────────────────────
+    buf.setCursor(0, 10)
+    buf.setForeground(Color.WHITE)
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.write("Text styles:")
+    buf.resetAttributes()
 
-    // Resize demo
-    println("Before resize (40x5):")
-    buf.clearAll()
-    buf.write("AAAAAAAAAA")
-    buf.setCursor(0, 1)
-    buf.write("BBBBBBBBBB")
-    println(buf.getScreenContent())
-    println()
+    buf.setCursor(2, 11)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.write("Bold")
+    buf.resetAttributes()
+    buf.write("  ")
+    buf.addStyle(StyleFlag.ITALIC)
+    buf.write("Italic")
+    buf.resetAttributes()
+    buf.write("  ")
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.write("Underline")
+    buf.resetAttributes()
+    buf.write("  ")
+    buf.addStyle(StyleFlag.DIM)
+    buf.write("Dim")
+    buf.resetAttributes()
+    buf.write("  ")
+    buf.addStyle(StyleFlag.STRIKETHROUGH)
+    buf.write("Strikethrough")
+    buf.resetAttributes()
+    buf.write("  ")
+    buf.addStyle(StyleFlag.BOLD)
+    buf.addStyle(StyleFlag.ITALIC)
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.setForeground(Color.YELLOW)
+    buf.write("All combined")
+    buf.resetAttributes()
 
-    buf.resize(20, 3)
-    println("After resize to 20x3:")
-    println(buf.getScreenContent())
-    println("Scrollback size: ${buf.getScrollbackSize()}")
+    // ── Wide characters ─────────────────────────────────────────
+    buf.setCursor(0, 13)
+    buf.setForeground(Color.WHITE)
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.write("Wide characters (CJK):")
+    buf.resetAttributes()
 
-    println()
-    println("=== Demo Complete ===")
+    buf.setCursor(2, 14)
+    buf.setForeground(Color.BRIGHT_RED)
+    buf.write("\u4F60\u597D")  // 你好
+    buf.setForeground(Color.BRIGHT_GREEN)
+    buf.write("\u4E16\u754C")  // 世界
+    buf.resetAttributes()
+    buf.write(" = Hello World")
+
+    // ── Simulated command output ────────────────────────────────
+    buf.setCursor(0, 16)
+    buf.setForeground(Color.WHITE)
+    buf.addStyle(StyleFlag.UNDERLINE)
+    buf.write("Simulated ls output:")
+    buf.resetAttributes()
+
+    val files = listOf(
+        Triple("src/", Color.BLUE, true),
+        Triple("build.gradle.kts", Color.GREEN, false),
+        Triple("README.md", Color.WHITE, false),
+        Triple("gradlew", Color.RED, true),
+        Triple("settings.gradle.kts", Color.GREEN, false),
+    )
+    buf.setCursor(2, 17)
+    for ((name, color, bold) in files) {
+        buf.setForeground(color)
+        if (bold) buf.addStyle(StyleFlag.BOLD)
+        buf.write(name)
+        buf.resetAttributes()
+        buf.write("  ")
+    }
+
+    // ── Scrollback hint ─────────────────────────────────────────
+    buf.setCursor(0, 19)
+    buf.setForeground(Color.BRIGHT_BLACK)
+    buf.write("(Scroll up with Shift+\u2191 to see scrollback history)")
+    buf.resetAttributes()
+
+    // Push current content into scrollback by inserting blank lines
+    for (i in 1..18) buf.insertLineAtBottom()
+
+    // Draw a prompt section at the bottom of the now-scrolled screen
+    buf.setCursor(0, 20)
+    buf.setForeground(Color.GREEN)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.write("user@terminal")
+    buf.resetAttributes()
+    buf.write(":")
+    buf.setForeground(Color.BLUE)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.write("~/project")
+    buf.resetAttributes()
+    buf.write("$ ")
+    buf.setForeground(Color.WHITE)
+    buf.write("./gradlew build")
+    buf.resetAttributes()
+
+    buf.setCursor(0, 21)
+    buf.setForeground(Color.WHITE)
+    buf.write("> Task :compileKotlin")
+
+    buf.setCursor(0, 22)
+    buf.setForeground(Color.BRIGHT_GREEN)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.write("BUILD SUCCESSFUL")
+    buf.resetAttributes()
+    buf.setForeground(Color.WHITE)
+    buf.write(" in 3s")
+
+    buf.setCursor(0, 23)
+    buf.setForeground(Color.GREEN)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.write("user@terminal")
+    buf.resetAttributes()
+    buf.write(":")
+    buf.setForeground(Color.BLUE)
+    buf.addStyle(StyleFlag.BOLD)
+    buf.write("~/project")
+    buf.resetAttributes()
+    buf.write("$ ")
+    buf.resetAttributes()
+
+    // Launch the interactive viewer
+    val viewer = TerminalBufferViewer(buf)
+    viewer.show()
 }

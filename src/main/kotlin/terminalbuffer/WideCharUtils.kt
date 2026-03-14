@@ -6,7 +6,7 @@ object WideCharUtils {
      * in terminal display. Covers CJK ideographs, fullwidth forms, and common emoji ranges.
      */
     fun isWideChar(codePoint: Int): Boolean {
-        // CJK Ideographs and related blocks detected by JDK
+        // CJKV Ideographs and related blocks detected by JDK
         if (Character.isIdeographic(codePoint)) return true
 
         return when (codePoint) {
